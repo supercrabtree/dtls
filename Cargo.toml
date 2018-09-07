@@ -1,0 +1,6 @@
+[package]
+name = "dtls"
+version = "0.1.0"
+authors = ["George Crabtree <supercrabtree@googlemail.com>"]
+
+[dependencies]
