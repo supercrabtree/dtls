@@ -1,10 +1,11 @@
 use std::fs;
+use std::fs::DirEntry;
 use std::env;
 
 fn main () {
     let args: Vec<String> = env::args().collect();
     let directory = parse_config(&args);
-    print_directory(directory);
+    list_directory_contents(directory);
 }
 
 fn parse_config(args: &[String]) -> &str {
@@ -15,15 +16,15 @@ fn parse_config(args: &[String]) -> &str {
     directory
 }
 
-fn print_directory(directory: &str) {
+fn list_directory_contents(directory: &str) {
     if let Ok(entries) = fs::read_dir(directory) {
         for entry in entries {
             if let Ok(entry) = entry {
                 if let Ok(metadata) = entry.metadata() {
                     if metadata.is_dir() {
-                        println!("\x1B[34m{}\x1B[0m", entry.path().display());
+                        print_directory(entry);
                     } else {
-                        println!("{}", entry.path().display());
+                        print_file(entry);
                     }
                 }
             }
@@ -31,4 +32,12 @@ fn print_directory(directory: &str) {
     } else {
         eprintln!("Cannot find directory {}", directory);
     }
+}
+
+fn print_directory(directory: DirEntry) {
+    println!("\x1B[34m{}\x1B[0m", directory.path().display());
+}
+
+fn print_file(file: DirEntry) {
+    println!("{}", file.path().display());
 }
