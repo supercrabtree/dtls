@@ -17,6 +17,8 @@ fn main () {
                 }
             }
         }
+    } else {
+        eprintln!("Cannot find directory {}", directory);
     }
 }
 
