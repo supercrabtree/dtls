@@ -1,5 +1,7 @@
 use std::fs;
 use std::fs::DirEntry;
+use std::fs::Metadata;
+use std::os::unix::fs::PermissionsExt;
 use std::env;
 
 fn main () {
@@ -22,9 +24,9 @@ fn list_directory_contents(directory: &str) {
             if let Ok(entry) = entry {
                 if let Ok(metadata) = entry.metadata() {
                     if metadata.is_dir() {
-                        print_directory(entry);
+                        print_directory(entry, metadata);
                     } else {
-                        print_file(entry);
+                        print_file(entry, metadata);
                     }
                 }
             }
@@ -34,10 +36,21 @@ fn list_directory_contents(directory: &str) {
     }
 }
 
-fn print_directory(directory: DirEntry) {
-    println!("\x1B[34m{}\x1B[0m", directory.path().display());
+fn print_directory(directory: DirEntry, metadata: Metadata) {
+    let mode = metadata.permissions().mode();
+    let short_permissions = to_short_permissions(mode);
+    println!("{} \x1B[34m{}\x1B[0m", short_permissions, directory.path().display());
 }
 
-fn print_file(file: DirEntry) {
-    println!("{}", file.path().display());
+fn print_file(file: DirEntry, metadata: Metadata) {
+    let mode = metadata.permissions().mode();
+    let short_permissions = to_short_permissions(mode);
+    println!("{} {}", short_permissions, file.path().display());
+}
+
+fn to_short_permissions(mode: u32) -> String {
+    let mode_as_string = String::from(format!("{:o}", mode));
+    let idx = mode_as_string.len() - 3;
+    let short_permissions = &mode_as_string[idx..];
+    String::from(short_permissions)
 }
