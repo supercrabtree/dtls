@@ -4,6 +4,8 @@ use std::fs::Metadata;
 use std::os::unix::fs::PermissionsExt;
 use std::env;
 
+mod colors;
+
 fn main () {
     let args: Vec<String> = env::args().collect();
     let directory = parse_config(&args);
@@ -39,7 +41,7 @@ fn list_directory_contents(directory: &str) {
 fn print_directory(directory: DirEntry, metadata: Metadata) {
     let mode = metadata.permissions().mode();
     let short_permissions = to_short_permissions(mode);
-    let blue_path = color_string_blue(directory.path().display().to_string());
+    let blue_path = colors::blue(directory.path().display().to_string());
     println!("{} {}", short_permissions, blue_path);
 }
 
@@ -54,8 +56,4 @@ fn to_short_permissions(mode: u32) -> String {
     let idx = mode_as_string.len() - 3;
     let short_permissions = &mode_as_string[idx..];
     String::from(short_permissions)
-}
-
-fn color_string_blue(s: String) -> String {
-    format!("\x1B[34m{}\x1B[0m", s)
 }
